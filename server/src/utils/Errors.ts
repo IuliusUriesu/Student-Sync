@@ -1,0 +1,15 @@
+export class InternalServerError extends Error { }
+export class StudentNotFoundError extends Error { }
+export class InvalidStudentError extends Error { }
+export class BadRequestError extends Error { }
+export class InvalidPageError extends Error { } 
+export class PageNotFoundError extends Error { }
+export class InvalidSortCriteria extends Error { }
+export class InvalidEnrollmentError extends Error { }
+export class ForeignKeyError extends Error { }
+export class DuplicateEnrollmentError extends Error { }
+export class InvalidUserError extends Error { }
+export class DuplicateUserError extends Error { }
+export class AuthenticationError extends Error { }
+export class InvalidRefreshTokenError extends Error { }
+export class UserNotFoundError extends Error { }

@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model students {
+  id_student  Int           @id @default(autoincrement())
+  full_name   String        @db.VarChar(50)
+  score       Decimal       @db.Decimal(4, 2)
+  bio         String        @db.VarChar(200)
+  id_user     Int
+  enrollments enrollments[]
+  users       users         @relation(fields: [id_user], references: [id_user], onDelete: Cascade, map: "FK_students_users")
+
+  @@index([id_user], map: "FK_students_users_idx")
+}
+
+model enrollments {
+  id_enrollment   Int      @id @default(autoincrement())
+  id_student      Int
+  course_name     String   @db.VarChar(100)
+  enrollment_date DateTime @db.Date
+  grade           Decimal  @db.Decimal(4, 2)
+  students        students @relation(fields: [id_student], references: [id_student], onDelete: Cascade, map: "FK_enrollments_students")
+
+  @@index([id_student], map: "FK_enrollments_students_idx")
+}
+
+model users {
+  id_user       Int        @id @default(autoincrement())
+  username      String     @unique(map: "username_UNIQUE") @db.VarChar(50)
+  password      String     @db.VarChar(100)
+  refresh_token String?    @db.VarChar(100)
+  students      students[]
+}

@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply bg-slate-200;
+}
+
+.nav-bar-btn {
+    @apply mx-1 p-2 rounded-lg hover:bg-black font-semibold;
+}
+
+.student-btn {
+    @apply flex-1 px-2 py-1 rounded-md text-white text-center;
+}
+
+.delete-msg-btn {
+    @apply px-2 py-1 rounded-md text-white w-1/3 mx-auto;
+}
+
+.page-nav-btn {
+    @apply px-2 py-1 text-white w-1/12 border border-black text-center;
+    @apply hover:bg-blue-900 hover:font-bold;
+}
+
+.page-title {
+    @apply text-2xl text-center font-bold my-8;
+}
+
+.form-styling {
+    @apply mx-auto max-w-xl p-4 bg-white shadow-lg rounded-3xl border-2 border-sky-500;
+}
+
+.form-label {
+    @apply block text-black font-semibold mb-2;
+}
+
+.form-input {
+    @apply shadow appearance-none border border-gray-300 rounded w-full py-1 px-2 leading-tight text-sm;
+    @apply focus:outline-none focus:shadow-lg focus:shadow-sky-200;
+}
+
+.form-submit-btn {
+    @apply px-2 py-1 text-white rounded-md w-1/4 font-semibold bg-sky-500 hover:bg-sky-700;
+}
+
+.form-submit-msg {
+    @apply p-2 border-2 rounded-lg font-semibold text-sm;
+}
+
+.ok-msg {
+    @apply border-green-600 text-green-600 bg-green-100;
+}
+
+.error-msg {
+    @apply border-red-600 text-red-600 bg-red-100;
+}
+
+.server-down-msg {
+    @apply border-orange-600 text-orange-600 bg-orange-100;
+}
+
+.go-back-btn {
+    @apply px-4 py-2 mt-4 ml-4 rounded-md bg-gray-600 text-white absolute z-10;
+}
+
+.table-header {
+    @apply px-6 py-2 text-center tracking-wider text-white font-bold;
+}
+
+.table-cell {
+    @apply px-6 py-3 text-center text-sm font-semibold;
+}
+
+.link {
+    @apply text-blue-600 underline hover:text-blue-800;
+}
