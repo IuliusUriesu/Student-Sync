@@ -75,16 +75,18 @@ userRouter.post('/login', async (req, res) => {
         }
 
         const accessToken = generateAccessToken(user);
-        const refreshToken = jwt.sign(user, refreshTokenSecret);
+        const refreshToken = jwt.sign(user, refreshTokenSecret, { expiresIn: '1d' });
 
         await service.storeRefreshToken(user.id_user, refreshToken);
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             secure: false,
+            path: '/',
+            sameSite: 'lax',
         });
 
-        res.status(200).send({ accessToken: accessToken });
+        res.status(200).send({ accessToken: accessToken, user: user });
     }
     catch (error) {
         if (error instanceof BadRequestError) {
@@ -101,8 +103,8 @@ userRouter.post('/login', async (req, res) => {
 });
 
 userRouter.post('/token', async (req, res) => {
-    const refreshToken = req.cookies['refreshToken'];
-    if (!refreshToken || typeof refreshToken !== 'string') {
+    const refreshToken: string = req.cookies['refreshToken'];
+    if (!refreshToken) {
         console.error('Refresh token cookie error');
         return res.status(500).send('An unexpected error occurred!');
     }

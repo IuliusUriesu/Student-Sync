@@ -17,7 +17,7 @@ export function authorizationMiddleware(req: ExtendedRequest, res: Response, nex
 
     jwt.verify(token, accessTokenSecret, (error, user) => {
         if (error) {
-            return res.status(403).send('Invalid token!');
+            return res.status(403).send('Invalid access token!');
         }
 
         req.user = user;

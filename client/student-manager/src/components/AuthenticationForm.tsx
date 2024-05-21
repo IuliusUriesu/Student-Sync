@@ -4,10 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import PasswordRequirements from "./PasswordRequirements";
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
-import { AxiosError } from "axios";
-import { User } from "../utils/user";
 import { AuthenticationContext } from "../contexts/AuthenticationContext";
-import { authApi } from "../utils/api/authApi";
 
 interface AuthenticationFormProps {
   type: "sign-in" | "register";
@@ -29,9 +26,9 @@ function AuthenticationForm({ type }: AuthenticationFormProps) {
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [alert, setAlert] = useState<any>(null);
 
-  const navigate = useNavigate();
+  const { signIn, register } = useContext(AuthenticationContext);
 
-  const { setAccessToken } = useContext(AuthenticationContext);
+  const navigate = useNavigate();
 
   const check8Characters = (): boolean => {
     return formData.password.length >= 8;
@@ -108,63 +105,42 @@ function AuthenticationForm({ type }: AuthenticationFormProps) {
     }));
   };
 
-  const register = () => {
+  const registerSubmit = async () => {
     if (!checkAll() || !passwordsMatch) {
       return;
     }
 
-    const user: User = {
-      username: formData.username,
-      password: formData.password,
-    };
-
-    authApi
-      .post("/api/users", user)
-      .then(() => {
-        // setAlert(
-        //   <div className="form-submit-msg ok-msg">
-        //     User registered successfully!
-        //   </div>
-        // );
-        // resetForm();
-        navigate("/sign-in");
-      })
-      .catch((error: AxiosError) => {
-        let message: any = "An unexpected error occurred!";
-        if (error.response) {
-          message = error.response.data;
-        }
-        setAlert(<div className="form-submit-msg error-msg">{message}</div>);
-      });
+    try {
+      await register(formData.username, formData.password);
+      navigate("/sign-in");
+    } catch (error) {
+      setAlert(
+        <div className="form-submit-msg error-msg">
+          {(error as Error).message}
+        </div>
+      );
+    }
   };
 
-  const signIn = () => {
-    const user: User = {
-      username: formData.username,
-      password: formData.password,
-    };
-
-    authApi
-      .post("/api/users/login", user)
-      .then((res) => {
-        navigate("/");
-        setAccessToken(res.data.accessToken);
-      })
-      .catch((error: AxiosError) => {
-        let message: any = "An unexpected error occurred!";
-        if (error.response) {
-          message = error.response.data;
-        }
-        setAlert(<div className="form-submit-msg error-msg">{message}</div>);
-      });
+  const signInSubmit = async () => {
+    try {
+      await signIn(formData.username, formData.password);
+      navigate("/");
+    } catch (error) {
+      setAlert(
+        <div className="form-submit-msg error-msg">
+          {(error as Error).message}
+        </div>
+      );
+    }
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (type === "register") {
-      register();
+      registerSubmit();
     } else {
-      signIn();
+      signInSubmit();
     }
   };
 

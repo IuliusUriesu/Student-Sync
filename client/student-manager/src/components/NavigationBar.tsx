@@ -1,17 +1,25 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ServerStatusContext } from "../contexts/ServerStatusContext";
 import { AuthenticationContext } from "../contexts/AuthenticationContext";
 
 function NavigationBar() {
   const { serverOnline } = useContext(ServerStatusContext);
-  const { accessToken, setAccessToken } = useContext(AuthenticationContext);
+  const { user, signOut, mustSignOut } = useContext(AuthenticationContext);
 
   const navigate = useNavigate();
 
+  const performSignOut = async () => {
+    await signOut();
+    navigate("/sign-in");
+  };
+
+  useEffect(() => {
+    if (mustSignOut) performSignOut();
+  }, [mustSignOut]);
+
   const handleSignOutClick = () => {
-    navigate("/");
-    setAccessToken(null);
+    performSignOut();
   };
 
   const serverLabel = serverOnline ? (
@@ -20,7 +28,7 @@ function NavigationBar() {
     <p className="font-bold text-xs text-red-600">OFFLINE</p>
   );
 
-  const navLinks = accessToken ? (
+  const navLinks = user ? (
     <div>
       <Link to="/" className="nav-bar-btn">
         Home
@@ -35,7 +43,7 @@ function NavigationBar() {
         Grades Chart
       </Link>
       <button className="nav-bar-btn" onClick={handleSignOutClick}>
-        Sign out
+        {user.username}
       </button>
     </div>
   ) : (

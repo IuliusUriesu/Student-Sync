@@ -1,4 +1,5 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { AuthenticationContext } from "./AuthenticationContext";
 
 interface PagePropertiesInterface {
   currentPage: number;
@@ -38,6 +39,12 @@ interface StudentsPageProviderProps {
 
 export function StudentsPageProvider({ children }: StudentsPageProviderProps) {
   const [pageProperties, setPageProperties] = useState(defaultPageProperties);
+
+  const { user } = useContext(AuthenticationContext);
+
+  useEffect(() => {
+    if (user) setPageProperties(defaultPageProperties);
+  }, [user]);
 
   const setCurrentPage = (newCurrentPage: number) => {
     setPageProperties((prevState) => ({

@@ -41,13 +41,30 @@ export function ServerStatusProvider({ children }: ServerStatusProviderProps) {
   const [activeStudentList, setActiveStudentList] = useState<Student[]>([]);
   const [requestQueue, setRequestQueue] = useState<Request[]>([]);
 
+  const sendRequests = async () => {
+    //console.log(requestQueue);
+    for (const req of requestQueue) {
+      try {
+        const res = await req.send();
+        console.log(res.data);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    setRequestQueue([]);
+  };
+
   useEffect(() => {
     const pingServer = () => {
       pingApi
         .get("/api/ping")
-        .then((res) => {
+        .then(async (res) => {
           console.log(res.data);
-          if (!serverOnline) setServerOnline(true);
+          if (!serverOnline) {
+            await sendRequests();
+            setServerOnline(true);
+          }
         })
         .catch(() => {
           console.log("Server Offline");
@@ -55,30 +72,16 @@ export function ServerStatusProvider({ children }: ServerStatusProviderProps) {
         });
     };
 
-    const sendRequests = async () => {
-      for (const req of requestQueue) {
-        try {
-          const res = await req.send();
-          console.log(res.data);
-        } catch (error) {
-          console.log(error);
-        }
-      }
-
-      setRequestQueue([]);
-    };
-
-    if (serverOnline) {
-      sendRequests();
-    }
-
     const intervalId = setInterval(pingServer, 3000);
     return () => clearInterval(intervalId);
-  }, [serverOnline]);
+  }, [serverOnline, requestQueue]);
 
   const pushInQueue = (req: Request) => {
-    const newRequestQueue = [...requestQueue, req];
-    setRequestQueue(newRequestQueue);
+    setRequestQueue((prevState) => {
+      const newRequestQueue = [...prevState, req];
+      //console.log(newRequestQueue);
+      return newRequestQueue;
+    });
   };
 
   const deleteFromActiveList = (id: number) => {

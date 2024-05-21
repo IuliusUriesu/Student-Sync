@@ -11,7 +11,11 @@ import { userRouter } from './controllers/UserController';
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'DELETE', 'PUT'],
+}));
 app.use(cookieParser());
 
 app.use('/api/students', studentRouter);

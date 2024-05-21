@@ -21,11 +21,6 @@ function StudentList({ onDelete }: StudentListProps) {
   } = useContext(ServerStatusContext);
 
   const fetchStudentPage = () => {
-    if (!serverOnline) {
-      setStudentList(activeStudentList);
-      return;
-    }
-
     let sortBy = "";
     if (pageProperties.sortBy === "ID") {
       sortBy = "id_student";
@@ -45,6 +40,7 @@ function StudentList({ onDelete }: StudentListProps) {
     const currentPage = pageProperties.currentPage;
     const pageSize = pageProperties.pageSize;
 
+    //console.log("fetch student page");
     dataApi
       .get(
         `/api/students/pages/${currentPage}?pageSize=${pageSize}&sortBy=${sortBy}&order=${order}`
@@ -62,8 +58,16 @@ function StudentList({ onDelete }: StudentListProps) {
   }, [studentList]);
 
   useEffect(() => {
-    fetchStudentPage();
-  }, [pageProperties, serverOnline, activeStudentList]);
+    if (serverOnline) {
+      fetchStudentPage();
+    } else {
+      setStudentList(activeStudentList);
+    }
+  }, [pageProperties, serverOnline]);
+
+  useEffect(() => {
+    if (!serverOnline) setStudentList(activeStudentList);
+  }, [activeStudentList]);
 
   const handleDelete = (id: number) => {
     if (!serverOnline) {
