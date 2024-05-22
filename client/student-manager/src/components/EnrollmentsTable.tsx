@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Enrollment } from "../utils/enrollment";
 import { dataApi } from "../utils/api/dataApi";
+import InfiniteScroll from "react-infinite-scroll-component";
+import axios, { CancelTokenSource } from "axios";
 
 interface EnrollmentsTableProps {
   studentId: number;
@@ -8,28 +10,58 @@ interface EnrollmentsTableProps {
 
 function EnrollmentsTable({ studentId }: EnrollmentsTableProps) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
-    const fetchEnrollments = () => {
-      dataApi
-        .get(`/api/students/enrollments/${studentId}`)
-        .then((res) => {
-          const enrollmentList: Enrollment[] = [];
-          for (const enrollment of res.data) {
-            enrollmentList.push({
-              ...enrollment,
-              enrollment_date: new Date(enrollment.enrollment_date),
-            });
-          }
-          setEnrollments(enrollmentList);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    };
+    //console.log("EnrollmentsTable mounted");
+    const source = axios.CancelToken.source();
+    fetchEnrollments(source);
 
-    fetchEnrollments();
-  }, [studentId]);
+    return () => {
+      //console.log("EnrollmentsTable umounts...");
+      source.cancel("Request canceled");
+    };
+  }, []);
+
+  const sleep = (ms: number): Promise<void> => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  };
+
+  const fetchEnrollments = async (source?: CancelTokenSource) => {
+    //console.log("Fetching...");
+    await sleep(1250);
+    dataApi
+      .get(
+        `/api/students/enrollments/pages/${studentId}?page=${page}&size=20`,
+        {
+          cancelToken: source?.token,
+        }
+      )
+      .then((res) => {
+        if (!res) {
+          return;
+        }
+
+        const enrollmentPage: Enrollment[] = [];
+        for (const enrollment of res.data) {
+          enrollmentPage.push({
+            ...enrollment,
+            enrollment_date: new Date(enrollment.enrollment_date),
+          });
+        }
+
+        //console.log(enrollmentPage.length);
+        //console.log("Done fetching");
+
+        setEnrollments((prevState) => [...prevState, ...enrollmentPage]);
+        setPage((prevState) => prevState + 1);
+        setHasMore(enrollmentPage.length === 20);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const months: string[] = [
     "Jan",
@@ -47,32 +79,43 @@ function EnrollmentsTable({ studentId }: EnrollmentsTableProps) {
   ];
 
   const tableRows = enrollments.map((enrollment) => {
+    //console.log(`Enrollment ID: ${enrollment.id_enrollment}`);
+
     const day = enrollment.enrollment_date.getDate();
     const month = enrollment.enrollment_date.getMonth();
     const year = enrollment.enrollment_date.getFullYear();
     const formattedDate: string = `${months[month]} ${day}, ${year}`;
 
     return (
-      <tr key={enrollment.id_enrollment}>
-        <td className="table-cell">{enrollment.course_name}</td>
-        <td className="table-cell">{formattedDate}</td>
-        <td className="table-cell">{enrollment.grade}</td>
-      </tr>
+      <div key={enrollment.id_enrollment} className="table-row">
+        <div className="table-cell w-2/5">{enrollment.course_name}</div>
+        <div className="table-cell w-1/3">{formattedDate}</div>
+        <div className="table-cell w-1/5">{enrollment.grade}</div>
+      </div>
     );
   });
 
   return (
-    <table className="mx-auto my-16 divide-y-2 divide-sky-500 bg-white w-2/3 shadow-lg">
-      <thead className="bg-sky-500 sticky top-0 z-10">
-        <tr>
-          <th className="table-header">Course Name</th>
-          <th className="table-header">Enrollment Date</th>
-          <th className="table-header">Grade</th>
-        </tr>
-      </thead>
+    <div className="mx-auto my-16 divide-y-2 divide-sky-500 bg-white w-2/3 shadow-lg">
+      <div className="bg-sky-500 sticky top-0 z-10 table-row">
+        <div className="table-header w-2/5">Course Name</div>
+        <div className="table-header w-1/3">Enrollment Date</div>
+        <div className="table-header w-1/5">Grade</div>
+      </div>
 
-      <tbody className="divide-y-2 divide-sky-500">{tableRows}</tbody>
-    </table>
+      <InfiniteScroll
+        dataLength={enrollments.length}
+        next={() => fetchEnrollments()}
+        hasMore={hasMore}
+        loader={
+          <div className="py-2 text-center border-t-sky-500 border-t-2 font-semibold">
+            Loading...
+          </div>
+        }
+      >
+        <div className="divide-y-2 divide-sky-500">{tableRows}</div>
+      </InfiniteScroll>
+    </div>
   );
 }
 

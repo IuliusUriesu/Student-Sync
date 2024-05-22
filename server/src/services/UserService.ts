@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { User } from "../domain/User";
-import { AuthenticationError, DuplicateUserError, InternalServerError, InvalidRefreshTokenError, InvalidUserError, UserNotFoundError } from "../utils/Errors";
+import { AuthenticationError, DuplicateUserError, InternalServerError, InvalidRefreshTokenError, InvalidUserError, UserNotFoundError } from "../utils/errors";
 import { prisma } from "../utils/PrismaClient";
 import { validateUser } from "../validations/UserValidation";
 import bcrypt from "bcrypt";

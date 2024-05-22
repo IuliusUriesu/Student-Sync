@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as service from "../services/UserService";
 import { validateUserRequestBody } from "../validations/UserRequestValidation";
 import { User } from "../domain/User";
-import { AuthenticationError, BadRequestError, DuplicateUserError, InternalServerError, InvalidRefreshTokenError, InvalidUserError, UserNotFoundError } from "../utils/Errors";
+import { AuthenticationError, BadRequestError, DuplicateUserError, InternalServerError, InvalidRefreshTokenError, InvalidUserError, UserNotFoundError } from "../utils/errors";
 import jwt from "jsonwebtoken";
 import { UserDTO } from "../domain/UserDTO";
 

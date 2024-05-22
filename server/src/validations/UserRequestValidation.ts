@@ -1,4 +1,4 @@
-import { BadRequestError } from "../utils/Errors";
+import { BadRequestError } from "../utils/errors";
 
 export function validateUserRequestBody(body: any) {
     const correctKeys = ['username', 'password'];

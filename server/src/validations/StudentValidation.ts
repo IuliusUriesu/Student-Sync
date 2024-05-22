@@ -1,5 +1,5 @@
 import { Enrollment } from "../domain/Enrollment";
-import { InvalidStudentError, InvalidPageError, InvalidSortCriteria, InvalidEnrollmentError } from "../utils/Errors";
+import { InvalidStudentError, InvalidPageError, InvalidSortCriteria, InvalidEnrollmentError } from "../utils/errors";
 import { Student } from "../domain/Student";
 
 export function validateStudent(student: Student): void {

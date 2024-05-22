@@ -1,5 +1,5 @@
 import { User } from "../domain/User";
-import { InvalidUserError } from "../utils/Errors";
+import { InvalidUserError } from "../utils/errors";
 
 export function validateUser(user: User) {
     const regex = /^[a-zA-Z0-9_]{3,}$/;

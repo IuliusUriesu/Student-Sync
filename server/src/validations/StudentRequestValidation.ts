@@ -1,5 +1,5 @@
 import { isValid, parse } from "date-fns";
-import { BadRequestError } from "../utils/Errors";
+import { BadRequestError } from "../utils/errors";
 
 export function validateStudentRequestBody(body: any) {
     const correctKeys = ['full_name', 'score', 'bio'];
@@ -86,6 +86,22 @@ export function validateEnrollmentRequestBody(body: any) {
 
     if (typeof body.grade !== 'number') {
         throw new BadRequestError('Property \'grade\' must be a number!');
+    }
+}
+
+export function validateEnrollmentPageRequestQuery(query: any) {
+    if (query.page) {
+        const page = parseInt(query.page);
+        if (isNaN(page)) {
+            throw new BadRequestError('Query parameter \'page\' must be a positive integer!');
+        }
+    }
+
+    if (query.size) {
+        const size = parseInt(query.size);
+        if (isNaN(size)) {
+            throw new BadRequestError('Query parameter \'size\' must be a positive integer!');
+        }
     }
 }
 

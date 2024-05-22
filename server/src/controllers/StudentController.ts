@@ -1,10 +1,10 @@
 import { Router } from "express";
 import * as service from "../services/StudentService";
-import { BadRequestError, DuplicateEnrollmentError, ForeignKeyError, InvalidEnrollmentError, InvalidPageError, InvalidSortCriteria, InvalidStudentError, PageNotFoundError, StudentNotFoundError } from "../utils/Errors";
+import { BadRequestError, DuplicateEnrollmentError, ForeignKeyError, InvalidEnrollmentError, InvalidPageError, InvalidSortCriteria, InvalidStudentError, PageNotFoundError, StudentNotFoundError } from "../utils/errors";
 import { Student } from "../domain/Student";
 import { Decimal } from "@prisma/client/runtime/library";
 import { Enrollment } from "../domain/Enrollment";
-import { validateDate, validateEnrollmentRequestBody, validateEnrollmentsRequestParams, validatePageRequest, validateStudentRequestBody, validateStudentRequestParams } from "../validations/StudentRequestValidation";
+import { validateDate, validateEnrollmentPageRequestQuery, validateEnrollmentRequestBody, validateEnrollmentsRequestParams, validatePageRequest, validateStudentRequestBody, validateStudentRequestParams } from "../validations/StudentRequestValidation";
 import { authorizationMiddleware } from "../middleware/authorizationMiddleware";
 import { ExtendedRequest } from "../utils/ExtendedRequest";
 
@@ -196,7 +196,7 @@ studentRouter.get('/passedFailedCount', async (req: ExtendedRequest, res) => {
     }
 });
 
-studentRouter.get('/enrollments/:studentId', async (req: ExtendedRequest, res) => {
+studentRouter.get('/enrollments/list/:studentId', async (req: ExtendedRequest, res) => {
     try {
         validateEnrollmentsRequestParams(req.params);
         const user = req.user;
@@ -242,6 +242,40 @@ studentRouter.post('/enrollments/:studentId', async (req: ExtendedRequest, res) 
             res.status(409).send(error.message);
         }
         else if (error instanceof StudentNotFoundError) {
+            res.status(404).send(error.message);
+        }
+        else {
+            console.error(error);
+            res.status(500).send('An unexpected error occurred!');
+        }
+    }
+});
+
+studentRouter.get('/enrollments/pages/:studentId', async (req: ExtendedRequest, res) => {
+    try {
+        validateEnrollmentsRequestParams(req.params);
+        validateEnrollmentPageRequestQuery(req.query);
+        const user = req.user;
+        const studentId = parseInt(req.params.studentId);
+
+        let pageNumber = 1;
+        if (req.query.page) {
+            pageNumber = Number(req.query.page);
+        }
+
+        let pageSize = 100;
+        if (req.query.size) {
+            pageSize = Number(req.query.size);
+        }
+
+        const enrollmentPage = await service.getEnrollmentPage(user.id_user, studentId, pageNumber, pageSize);
+        res.status(200).send(enrollmentPage);
+    }
+    catch (error) {
+        if (error instanceof BadRequestError || error instanceof InvalidPageError) {
+            res.status(400).send(error.message);
+        }
+        else if (error instanceof StudentNotFoundError || error instanceof PageNotFoundError) {
             res.status(404).send(error.message);
         }
         else {

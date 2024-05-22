@@ -68,6 +68,10 @@ body {
     @apply px-6 py-2 text-center tracking-wider text-white font-bold;
 }
 
+.table-row {
+    @apply flex flex-row justify-center;
+}
+
 .table-cell {
     @apply px-6 py-3 text-center text-sm font-semibold;
 }

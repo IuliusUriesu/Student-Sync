@@ -1,6 +1,6 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { prisma } from "../utils/PrismaClient";
-import { DuplicateEnrollmentError, ForeignKeyError, InternalServerError, InvalidEnrollmentError, InvalidPageError, InvalidSortCriteria, InvalidStudentError, PageNotFoundError, StudentNotFoundError } from "../utils/Errors";
+import { DuplicateEnrollmentError, ForeignKeyError, InternalServerError, InvalidEnrollmentError, InvalidPageError, InvalidSortCriteria, InvalidStudentError, PageNotFoundError, StudentNotFoundError } from "../utils/errors";
 import { Student } from "../domain/Student";
 import { Enrollment } from "../domain/Enrollment";
 import { validateEnrollment, validatePage, validateSortCriteria, validateStudent } from "../validations/StudentValidation";
@@ -148,7 +148,7 @@ export async function getStudentPage(id_user: number, pageNumber: number, pageSi
         });
 
         if (students.length === 0) {
-            throw new PageNotFoundError(`Page number ${pageNumber} was not found!`);
+            throw new PageNotFoundError(`Student page ${pageNumber} was not found!`);
         }
 
         return students;
@@ -285,6 +285,45 @@ export async function addEnrollment(id_user: number, enrollmentData: Enrollment)
         }
         else if (error instanceof PrismaClientKnownRequestError && error.code === 'P2003') {
             throw new ForeignKeyError(`Foreign key constraint failed: there is no student with id = ${enrollmentData.id_student}!`);
+        }
+        else {
+            throw new InternalServerError((error as Error).message);
+        }
+    }
+}
+
+export async function getEnrollmentPage(id_user: number, id_student: number, pageNumber: number, pageSize: number = 100): Promise<Enrollment[]> {
+    try {
+        validatePage(pageNumber, pageSize);
+
+        const student = await prisma.students.findUnique({
+            where: {
+                id_user: id_user,
+                id_student: id_student,
+            },
+        });
+    
+        if (student === null) {
+            throw new StudentNotFoundError(`Student with id = ${id_student} was not found!`);
+        }
+
+        const enrollments = await prisma.enrollments.findMany({
+            where: {
+                id_student: id_student,
+            },
+            skip: pageSize * (pageNumber - 1),
+            take: pageSize,
+        });
+
+        if (enrollments.length === 0) {
+            throw new PageNotFoundError(`Enrollments page ${pageNumber} was not found!`);
+        }
+
+        return enrollments;
+    }
+    catch (error) {
+        if (error instanceof StudentNotFoundError || error instanceof InvalidPageError || error instanceof PageNotFoundError) {
+            throw error;
         }
         else {
             throw new InternalServerError((error as Error).message);
