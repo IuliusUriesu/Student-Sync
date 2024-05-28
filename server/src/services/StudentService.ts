@@ -181,7 +181,7 @@ export async function getNumberOfPages(id_user: number, pageSize: number = 3): P
     }
 }
 
-export async function getPassedFailedCount(id_user: number): Promise<{passedCount: number, failedCount: number}> {
+export async function getPassedFailedCount(id_user: number): Promise<{ passedCount: number, failedCount: number }> {
     try {
         const passed = await prisma.students.count({
             where: {
@@ -292,7 +292,7 @@ export async function addEnrollment(id_user: number, enrollmentData: Enrollment)
     }
 }
 
-export async function getEnrollmentPage(id_user: number, id_student: number, pageNumber: number, pageSize: number = 100): Promise<Enrollment[]> {
+export async function getEnrollmentPage(id_user: number, id_student: number, pageNumber: number, pageSize: number = 100): Promise<{ page: Enrollment[], last: boolean }> {
     try {
         validatePage(pageNumber, pageSize);
 
@@ -319,7 +319,18 @@ export async function getEnrollmentPage(id_user: number, id_student: number, pag
             throw new PageNotFoundError(`Enrollments page ${pageNumber} was not found!`);
         }
 
-        return enrollments;
+        const nextPage = await prisma.enrollments.findMany({
+            where: {
+                id_student: id_student,
+            },
+            skip: pageSize * pageNumber,
+            take: 1,
+        });
+
+        return {
+            page: enrollments,
+            last: nextPage.length === 0,
+        };
     }
     catch (error) {
         if (error instanceof StudentNotFoundError || error instanceof InvalidPageError || error instanceof PageNotFoundError) {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Enrollment } from "../utils/enrollment";
 import { dataApi } from "../utils/api/dataApi";
 import InfiniteScroll from "react-infinite-scroll-component";
-import axios, { CancelTokenSource } from "axios";
+import axios, { AxiosError, CancelTokenSource } from "axios";
 
 interface EnrollmentsTableProps {
   studentId: number;
@@ -24,13 +24,8 @@ function EnrollmentsTable({ studentId }: EnrollmentsTableProps) {
     };
   }, []);
 
-  const sleep = (ms: number): Promise<void> => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-  };
-
   const fetchEnrollments = async (source?: CancelTokenSource) => {
     //console.log("Fetching...");
-    await sleep(1250);
     dataApi
       .get(
         `/api/students/enrollments/pages/${studentId}?page=${page}&size=20`,
@@ -44,22 +39,25 @@ function EnrollmentsTable({ studentId }: EnrollmentsTableProps) {
         }
 
         const enrollmentPage: Enrollment[] = [];
-        for (const enrollment of res.data) {
+        for (const enrollment of res.data.page) {
           enrollmentPage.push({
             ...enrollment,
             enrollment_date: new Date(enrollment.enrollment_date),
           });
         }
 
-        //console.log(enrollmentPage.length);
+        //console.log(enrollmentPage);
         //console.log("Done fetching");
 
         setEnrollments((prevState) => [...prevState, ...enrollmentPage]);
         setPage((prevState) => prevState + 1);
-        setHasMore(enrollmentPage.length === 20);
+        setHasMore(!res.data.last);
       })
-      .catch((error) => {
+      .catch((error: AxiosError) => {
         console.log(error);
+        if (error.response?.status === 404) {
+          setHasMore(false);
+        }
       });
   };
 

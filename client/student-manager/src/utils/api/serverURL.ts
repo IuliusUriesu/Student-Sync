@@ -1,0 +1,1 @@
+export const serverURL = "http://ec2-13-50-238-220.eu-north-1.compute.amazonaws.com"

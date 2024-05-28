@@ -61,7 +61,7 @@ function NavigationBar() {
     <nav className="bg-sky-500 text-white p-4">
       <div className="container mx-auto flex justify-between items-center">
         <div>
-          <h1 className="text-xl font-bold">Student Manager</h1>
+          <h1 className="text-xl font-bold">Student Sync</h1>
           {serverLabel}
         </div>
 

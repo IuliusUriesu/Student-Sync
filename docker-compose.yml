@@ -1,0 +1,31 @@
+services:
+  db:
+    build: ./db
+    image: iuliusuriesu/student-sync-db
+    container_name: student-sync-db
+    restart: always
+    env_file:
+      - ./db/.env
+    ports:
+      - "8000:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+  server:
+    build: ./server
+    image: iuliusuriesu/student-sync-server:1.0
+    container_name: student-sync-server
+    restart: always
+    env_file:
+      - ./server/.env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  db-data:

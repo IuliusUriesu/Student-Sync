@@ -37,10 +37,9 @@ function generateRandomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min) + min);
 }
 
-export async function insertData() {
+export async function insertData(studentCount: number, minEnrollmentCount: number, maxEnrollmentCount: number) {
     const id_user = 28;
 
-    const studentCount = 200;
     for (let i = 0; i < studentCount; i++) {
         const student = generateStudent();
         const insertedStudent = await prisma.students.create({
@@ -56,7 +55,7 @@ export async function insertData() {
         });
 
         const studentId = insertedStudent.id_student;
-        const enrollmentCount = generateRandomInt(10000, 30000);
+        const enrollmentCount = generateRandomInt(minEnrollmentCount, maxEnrollmentCount);
         for (let j = 0; j < enrollmentCount; j++) {
             const enrollment = generateEnrollment(studentId);
             try {
