@@ -13,10 +13,20 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+// app.use(cors({
+//   origin: 'http://localhost:4173',
+//   credentials: true,
+// }));
+
 app.use(cors({
-  origin: 'http://localhost:4173',
+  origin: 'http://localhost:5173',
   credentials: true,
 }));
+
+// app.use(cors({
+//   origin: 'http://ec2-16-16-77-205.eu-north-1.compute.amazonaws.com',
+//   credentials: true,
+// }));
 
 app.use('/api/students', studentRouter);
 app.use('/api/ping', pingRouter);

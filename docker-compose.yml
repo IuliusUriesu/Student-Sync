@@ -1,7 +1,7 @@
 services:
   db:
     build: ./db
-    image: iuliusuriesu/student-sync-db
+    image: iuliusuriesu/student-sync-db:latest
     container_name: student-sync-db
     restart: always
     env_file:
