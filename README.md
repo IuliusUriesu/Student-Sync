@@ -29,3 +29,14 @@ modern technologies to deliver a smooth experience for the users.
 • **Containerization:** Docker
 
 • **Deployment:** Amazon Web Services, Elastic Cloud Compute (the EC2 instance is currently stopped)
+
+## Application Preview
+![register](https://github.com/user-attachments/assets/81f8be7a-4bbe-4ad5-a040-ad1168e23b61)
+
+![students](https://github.com/user-attachments/assets/6e6d4956-a592-4d6f-bcb4-a8fbaa7248e1)
+
+![update](https://github.com/user-attachments/assets/7ad9fd7c-85ae-4468-a971-e059bb6c3d4e)
+
+![view](https://github.com/user-attachments/assets/cfd813cd-5210-4022-ae23-5a15691d42b9)
+
+![chart](https://github.com/user-attachments/assets/70e584fb-d209-4e97-9319-c579fba1e063)
