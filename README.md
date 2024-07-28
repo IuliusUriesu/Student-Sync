@@ -1,4 +1,4 @@
-# Student-Sync
+# Student Sync
 
 ## Overview
 Student Sync is a comprehensive full-stack application designed to streamline and simplify student management process. The project integrates various functionalities, as well as several 
